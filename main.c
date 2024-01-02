@@ -16,6 +16,7 @@ void method1();
 double method2();
 double method3();
 void *calculateMethod1(void* arg);
+void* calculateMethod2(void* arg);
 void* calculateMethod3(void* arg);
 void getInputs();
 
@@ -81,7 +82,36 @@ void* calculateMethod1(void* arg) {
 }
 
 double method2() {
-    return 0;
+    pthread_t threads[c];
+    ThreadArguments args[c];
+    long long int range = (b - a + 1) / c;
+    for (int i = 0; i < c; i++) {
+        args[i].begin = a;
+        if (i == c - 1) {
+            args[i].end = b;
+        } else {
+            args[i].end = a + range - 1;
+        }
+        if (pthread_create(&threads[i], NULL, calculateMethod2, &args[i])) {
+            fprintf(stderr, "Thread couldn't be created.\n");
+        }
+        a += range;
+    }
+    for (int i = 0; i < c; i++) {
+        pthread_join(threads[i], NULL);
+    }
+    printf("Sum of square roots for method 3 = %lf\n", global_sqrt_sum);
+    return global_sqrt_sum;
+}
+
+void* calculateMethod2(void* arg) {
+    ThreadArguments *threadArg2 = (ThreadArguments*) arg;
+    pthread_mutex_lock(&mutex);
+    for (long long i = threadArg2->begin; i <= threadArg2->end; i++) {
+        global_sqrt_sum += sqrt((double)i);
+    }
+    pthread_mutex_unlock(&mutex);
+    return NULL;
 }
 
 double method3() {
