@@ -134,11 +134,11 @@ void *sqrtSumMethod2(void *threadID) { //Calculate the sum of square roots for m
     } else { //If not, compute a mid-ending based on the starting point and intervals
         end = start + range  - 1;
     }
-    pthread_mutex_lock(&mutex); //Mutex for the global_sqrt_sum to define the critical section
     for(long long int i = start ; i <= end  ; i++){ //Compute all in secured global_sqrt_sum
+        pthread_mutex_lock(&mutex); //Mutex for the global_sqrt_sum to define the critical section
         global_sqrt_sum += sqrt((double)i);
+        pthread_mutex_unlock(&mutex); //End the critical section
     }
-    pthread_mutex_unlock(&mutex); //End the critical section
     return NULL;
 }
 
